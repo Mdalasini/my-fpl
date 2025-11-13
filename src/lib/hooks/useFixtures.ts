@@ -1,5 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { FixturesResponse, Fixture } from "../types/fixtures";
+import type {
+  FixturesResponse,
+  Fixture,
+  UpdateFixtureBody,
+} from "../types/fixtures";
 
 export function useFixtures(season: string) {
   return useQuery({
@@ -13,12 +17,6 @@ export function useFixtures(season: string) {
   });
 }
 
-interface UpdateFixtureInput {
-  gameweek?: number;
-  home_xg?: number | null;
-  away_xg?: number | null;
-}
-
 export function useUpdateFixture() {
   const queryClient = useQueryClient();
 
@@ -27,8 +25,8 @@ export function useUpdateFixture() {
       fixtureId,
       data,
     }: {
-      fixtureId: string;
-      data: UpdateFixtureInput;
+      fixtureId: number;
+      data: UpdateFixtureBody;
     }) => {
       const res = await fetch(`/api/fixtures/${fixtureId}`, {
         method: "PATCH",

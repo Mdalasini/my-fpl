@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
-import Game from "@/lib/domain/Game";
 import dbConnect from "@/lib/infra/mongoose";
-import type { Fixture } from "@/lib/types/fixtures";
-
-interface UpdateFixtureBody {
-  gameweek?: number;
-  home_xg?: number | null;
-  away_xg?: number | null;
-}
+import { updateFixture } from "@/lib/services/FixtureService";
+import type { UpdateFixtureBody } from "@/lib/types/fixtures";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { fixtureId: string } },
+  { params }: { params: { fixtureId: number } },
 ) {
   try {
     await dbConnect();
@@ -51,31 +45,11 @@ export async function PATCH(
       );
     }
 
-    // Build update object with only provided fields
-    const updateData: Partial<Fixture> = {};
-    if (body.gameweek !== undefined) updateData.gameweek = body.gameweek;
-    if (body.home_xg !== undefined) updateData.home_xg = body.home_xg;
-    if (body.away_xg !== undefined) updateData.away_xg = body.away_xg;
-
     const { fixtureId } = await params;
-
-    const updatedGame = await Game.findByIdAndUpdate(fixtureId, updateData, {
-      new: true,
-      runValidators: true,
-    }).lean<Fixture>();
-
-    if (!updatedGame) {
-      return NextResponse.json({ error: "Fixture not found" }, { status: 404 });
-    }
+    await updateFixture(body, fixtureId);
 
     return NextResponse.json({
-      _id: updatedGame._id,
-      home_id: updatedGame.home_id,
-      away_id: updatedGame.away_id,
-      gameweek: updatedGame.gameweek,
-      season: updatedGame.season,
-      home_xg: updatedGame.home_xg,
-      away_xg: updatedGame.away_xg,
+      message: "Fixture updated successfully",
     });
   } catch (error) {
     console.error("Error updating fixture:", error);

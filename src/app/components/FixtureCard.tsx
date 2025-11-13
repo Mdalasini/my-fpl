@@ -46,7 +46,7 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
       }
 
       await updateMutation.mutateAsync({
-        fixtureId: fixture._id,
+        fixtureId: fixture.id,
         data: updateData,
       });
 
@@ -108,11 +108,11 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
         {/* Team Match Display */}
         <div className="flex items-center gap-4">
           <div className="flex-1">
-            <label htmlFor={`home-xg-${fixture._id}`} className="sr-only">
+            <label htmlFor={`home-xg-${fixture.id}`} className="sr-only">
               Home Team xG
             </label>
             <input
-              id={`home-xg-${fixture._id}`}
+              id={`home-xg-${fixture.id}`}
               type="number"
               value={homeXg}
               onChange={(e) => setHomeXg(e.target.value)}
@@ -126,11 +126,11 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
             </span>
             <span className="text-gray-400 mx-2">vs</span>
             <span className="text-gray-900 font-semibold">{awayTeamName}</span>
-            <label htmlFor={`away-xg-${fixture._id}`} className="sr-only">
+            <label htmlFor={`away-xg-${fixture.id}`} className="sr-only">
               Away Team xG
             </label>
             <input
-              id={`away-xg-${fixture._id}`}
+              id={`away-xg-${fixture.id}`}
               type="number"
               value={awayXg}
               onChange={(e) => setAwayXg(e.target.value)}
@@ -145,13 +145,13 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
         {/* Gameweek Input */}
         <div className="flex items-center gap-4">
           <label
-            htmlFor={`gw-${fixture._id}`}
+            htmlFor={`gw-${fixture.id}`}
             className="text-sm font-medium text-gray-700"
           >
             Gameweek:
           </label>
           <input
-            id={`gw-${fixture._id}`}
+            id={`gw-${fixture.id}`}
             type="number"
             value={gameweek}
             onChange={(e) =>
