@@ -19,6 +19,7 @@ export async function GET(request: Request) {
   const games = await Game.find({ season }).lean<Fixture[]>();
 
   const fixtures: FixturesResponse = games.map((game) => ({
+    _id: game._id,
     home_id: game.home_id,
     away_id: game.away_id,
     home_xg: game.home_xg,

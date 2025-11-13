@@ -135,7 +135,7 @@ function Table() {
   }
 
   return (
-    <section className="bg-white rounded-lg shadow-sm p-4 max-w-screen">
+    <section className="bg-white rounded-lg shadow-sm p-4 w-full">
       <TableControls
         onWindowChange={handleWindowChange}
         onSortByChange={handleSortByChange}
