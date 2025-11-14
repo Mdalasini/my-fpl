@@ -14,7 +14,7 @@ export function initDifficultyModel(allTeams: TeamData[]): void {
     return;
   }
 
-  const allScores = allTeams.map((t) => t.off_rating + t.def_rating);
+  const allScores = allTeams.map((t) => t.off_rating - t.def_rating);
   const sum = allScores.reduce((acc, score) => acc + score, 0);
   const mean = sum / allScores.length;
   LEAGUE_MEAN = mean;
@@ -65,14 +65,9 @@ function squash(x: number, k = 0.01): number {
   return 1 / (1 + Math.exp(-k * (x - LEAGUE_MEAN)));
 }
 
-function combineWeightedOffense(scores: number[]): number {
+function combineWeighted(scores: number[]): number {
   if (scores.length === 0) return 0;
   return 1 - scores.reduce((acc, score) => acc * (1 - score), 1);
-}
-
-function combineWeightedDefense(scores: number[]): number {
-  if (scores.length === 0) return 0;
-  return 1 - scores.reduce((acc, score) => acc * score, 1);
 }
 
 export function getAttack(
@@ -83,9 +78,9 @@ export function getAttack(
   if (opponents.length === 0) return { gw_attack: 0, difficulty: "invalid" };
 
   const scores = opponents.map((opponent) =>
-    squash(offenseA + TEAMBYID[opponent.team_id].def_rating, k),
+    squash(offenseA - TEAMBYID[opponent.team_id].def_rating, k),
   );
-  const gw_attack = combineWeightedOffense(scores);
+  const gw_attack = combineWeighted(scores);
 
   const difficulty =
     gw_attack > 0.66 ? "easy" : gw_attack > 0.33 ? "medium" : "hard";
@@ -104,9 +99,9 @@ export function getDefense(
   if (opponents.length === 0) return { gw_defense: 0, difficulty: "invalid" };
 
   const scores = opponents.map((opponent) =>
-    squash(defenseA + TEAMBYID[opponent.team_id].off_rating, k),
+    squash(defenseA - TEAMBYID[opponent.team_id].off_rating, k),
   );
-  const gw_defense = combineWeightedDefense(scores);
+  const gw_defense = combineWeighted(scores);
 
   const difficulty =
     gw_defense > 0.66 ? "easy" : gw_defense > 0.33 ? "medium" : "hard";

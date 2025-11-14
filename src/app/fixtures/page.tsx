@@ -167,7 +167,7 @@ function Dashboard() {
             <div className="space-y-2">
               {fixturesByGameweek.get(gameweek)?.map((fixture) => (
                 <FixtureCard
-                  key={fixture._id}
+                  key={fixture.id}
                   fixture={fixture}
                   teamsMap={teamsMap}
                 />
