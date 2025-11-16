@@ -1,9 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type {
-  FixturesResponse,
-  Fixture,
-  UpdateFixtureBody,
-} from "../types/fixtures";
+import type { Fixture, UpdateFixtureBody } from "../types/fixtures";
 
 export function useFixtures() {
   return useQuery({
@@ -11,7 +7,7 @@ export function useFixtures() {
     queryFn: async () => {
       const res = await fetch(`/api/fixtures`);
       if (!res.ok) throw new Error("Failed to fetch fixtures");
-      return res.json() as Promise<FixturesResponse>;
+      return res.json() as Promise<Fixture[]>;
     },
     enabled: true,
   });

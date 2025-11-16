@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { Fixture } from "@/lib/types/fixtures";
 import type { TeamData } from "@/lib/types/teams";
 import { sortByGameweek, sortByGameweekRange } from "./utils";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface Props {
   min: number;
@@ -22,7 +23,6 @@ export default function TableHeader({
   min,
   max,
   fixtures,
-  teams,
   sortBy,
   onOrderChange,
 }: Props) {
@@ -64,8 +64,7 @@ export default function TableHeader({
         sortKey,
       );
     } else {
-      const gw = min + (column - 1);
-      ordered = sortByGameweek(fixtures, gw, nextDirection, sortKey);
+      ordered = sortByGameweek(fixtures, column, nextDirection, sortKey);
     }
 
     setSortColumn(column);
@@ -79,18 +78,38 @@ export default function TableHeader({
     <thead>
       <tr>
         <th
-          className="px-2 py-2 text-left text-xs font-medium text-gray-600 cursor-pointer select-none"
+          className="sticky left-0 z-10 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2 border-b border-gray-200 cursor-pointer"
           onClick={() => handleHeaderClick(0)}
         >
-          Team
+          <div className="flex justify-between items-center gap-1">
+            <span>TEAM</span>
+            <div className="w-4 h-4">
+              {sortColumn === 0 &&
+                (sortDirection === "asc" ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronUp size={16} />
+                ))}
+            </div>
+          </div>
         </th>
         {gameweeks.map((gameweek) => (
           <th
             key={gameweek}
-            className="px-2 py-2 text-center text-xs font-medium text-gray-600 cursor-pointer select-none"
-            onClick={() => handleHeaderClick(gameweek - min + 1)}
+            className="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2 border-b border-gray-200 cursor-pointer"
+            onClick={() => handleHeaderClick(gameweek)}
           >
-            GW {gameweek}
+            <div className="flex justify-between items-center gap-1">
+              <span>GW {gameweek}</span>
+              <div className="w-4 h-4">
+                {sortColumn === gameweek &&
+                  (sortDirection === "asc" ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronUp size={16} />
+                  ))}
+              </div>
+            </div>
           </th>
         ))}
       </tr>
