@@ -9,7 +9,6 @@ interface Props {
   teamId: string;
   gameweek: number;
   sortBy: "offense" | "defense";
-  season: string;
 }
 
 const difficultyColorMap = {
@@ -19,9 +18,9 @@ const difficultyColorMap = {
   invalid: "bg-neutral-50",
 };
 
-export default function TableCell({ teamId, gameweek, sortBy, season }: Props) {
-  const fixturesQuery = useFixtures(season);
-  const teamsQuery = useTeams(season);
+export default function TableCell({ teamId, gameweek, sortBy }: Props) {
+  const fixturesQuery = useFixtures();
+  const teamsQuery = useTeams();
 
   if (!fixturesQuery.data || !teamsQuery.data) return null;
 

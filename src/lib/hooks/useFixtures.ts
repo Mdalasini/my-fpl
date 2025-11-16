@@ -5,15 +5,15 @@ import type {
   UpdateFixtureBody,
 } from "../types/fixtures";
 
-export function useFixtures(season: string) {
+export function useFixtures() {
   return useQuery({
-    queryKey: ["fixtures", season],
+    queryKey: ["fixtures"],
     queryFn: async () => {
-      const res = await fetch(`/api/fixtures?season=${season}`);
+      const res = await fetch(`/api/fixtures`);
       if (!res.ok) throw new Error("Failed to fetch fixtures");
       return res.json() as Promise<FixturesResponse>;
     },
-    enabled: !!season,
+    enabled: true,
   });
 }
 

@@ -5,11 +5,11 @@ import {
   type UpdateFixtureBody,
 } from "../types/fixtures";
 
-export async function getFixtures(season: string): Promise<Fixture[]> {
+export async function getFixtures(): Promise<Fixture[]> {
   const db = await dbConnect();
-  const result = await db.execute("SELECT * FROM fixtures WHERE season = ?", [
-    season,
-  ]);
+  const result = await db.execute(
+    "SELECT * FROM fixtures WHERE season = (SELECT value FROM app_config WHERE key = 'current_season')",
+  );
   return result.rows.map((row) => FixtureSchema.parse(row));
 }
 
@@ -20,18 +20,15 @@ export async function getFixture(id: number): Promise<Fixture | null> {
   return FixtureSchema.parse(result.rows[0]);
 }
 
-export async function getFixturesNotInEloChanges(
-  season: string,
-): Promise<Fixture[]> {
+export async function getFixturesNotInEloChanges(): Promise<Fixture[]> {
   const db = await dbConnect();
   const result = await db.execute(
     `
     SELECT * FROM fixtures
-    WHERE season = ?
+    WHERE season = (SELECT value FROM app_config WHERE key = 'current_season')
     AND id NOT IN (SELECT fixture_id FROM fixture_elo_changes)
     AND (home_xg IS NOT NULL OR away_xg IS NOT NULL)
   `,
-    [season],
   );
   return result.rows.map((row) => FixtureSchema.parse(row));
 }

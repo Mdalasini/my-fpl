@@ -1,7 +1,7 @@
 import dbConnect from "../infra/libsql";
 import { type TeamData, TeamDataSchema } from "../types/teams";
 
-export async function getTeams(season: string): Promise<TeamData[]> {
+export async function getTeams(): Promise<TeamData[]> {
   const db = await dbConnect();
   const result = await db.execute(
     `
@@ -13,14 +13,13 @@ export async function getTeams(season: string): Promise<TeamData[]> {
     INNER JOIN (
       SELECT DISTINCT team_id
       FROM (
-        SELECT home_id AS team_id FROM fixtures WHERE season = ?
+        SELECT home_id AS team_id FROM fixtures WHERE season = (SELECT value FROM app_config WHERE key = 'current_season')
         UNION
-        SELECT away_id AS team_id FROM fixtures WHERE season = ?
+        SELECT away_id AS team_id FROM fixtures WHERE season = (SELECT value FROM app_config WHERE key = 'current_season')
       )
     ) f ON t.team_id = f.team_id
     GROUP BY t.team_id, t.name, t.short_name, e.off_elo, e.def_elo, l.logo_path
   `,
-    [season, season],
   );
   return result.rows.map((row) => TeamDataSchema.parse(row));
 }

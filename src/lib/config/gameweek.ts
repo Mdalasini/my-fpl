@@ -1,1 +1,1 @@
-export const CURRENT_GAMEWEEK = 11;
+export const CURRENT_GAMEWEEK = 12;

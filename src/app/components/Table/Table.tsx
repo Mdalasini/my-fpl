@@ -3,16 +3,15 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
+import { useCurrentGameweek } from "@/lib/hooks/useCurrentGameweek";
 import type { Fixture } from "@/lib/types/fixtures";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import TableControls from "./TableControls";
 import { initDifficultyModel } from "./utils";
-import { CURRENT_GAMEWEEK } from "@/lib/config/gameweek";
 
 const queryClient = new QueryClient();
-const SEASON = "2025-2026";
 const WINDOW_SIZE = 10;
 
 function getMinMaxGameweek(fixtures: Fixture[]): { min: number; max: number } {
@@ -40,13 +39,19 @@ export default function FixtureTable() {
 }
 
 function Table() {
-  const fixturesQuery = useFixtures(SEASON);
-  const teamsQuery = useTeams(SEASON);
-  const [window, setWindow] = useState([
-    CURRENT_GAMEWEEK,
-    CURRENT_GAMEWEEK + WINDOW_SIZE - 1,
-  ]);
+  const fixturesQuery = useFixtures();
+  const teamsQuery = useTeams();
+  const gameweekQuery = useCurrentGameweek();
+  const [window, setWindow] = useState([1, 1 + WINDOW_SIZE - 1]); // Default initial state
   const [sortBy, setSortBy] = useState<"offense" | "defense">("offense");
+
+  // Set initial window based on fetched current gameweek
+  useEffect(() => {
+    if (gameweekQuery.data) {
+      const gameweek = gameweekQuery.data.gameweek;
+      setWindow([gameweek, gameweek + WINDOW_SIZE - 1]);
+    }
+  }, [gameweekQuery.data]);
 
   // Initialize difficulty model for utils used by child rows/cells
   if (teamsQuery.data) initDifficultyModel(teamsQuery.data);
@@ -106,7 +111,6 @@ function Table() {
           <tbody>
             {(orderedTeamIds ?? defaultTeamIds).map((teamId) => (
               <TableRow
-                season={SEASON}
                 sortBy={sortBy}
                 key={teamId}
                 teamId={teamId}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { CURRENT_SEASON } from "@/lib/config/season";
 import { CURRENT_GAMEWEEK } from "@/lib/config/gameweek";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
@@ -25,12 +24,12 @@ function Dashboard() {
     data: fixtures,
     isLoading: fixturesLoading,
     error: fixturesError,
-  } = useFixtures(CURRENT_SEASON);
+  } = useFixtures();
   const {
     data: teams,
     isLoading: teamsLoading,
     error: teamsError,
-  } = useTeams(CURRENT_SEASON);
+  } = useTeams();
 
   // Create a map of team_id to team short_name for quick lookup
   const teamsMap = useMemo(() => {
@@ -87,7 +86,6 @@ function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900">
             Fixtures Dashboard
           </h1>
-          <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -116,7 +114,6 @@ function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900">
             Fixtures Dashboard
           </h1>
-          <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-700">
           <h2 className="font-semibold mb-2">Error Loading Data</h2>
@@ -145,7 +142,6 @@ function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900">
             Fixtures Dashboard
           </h1>
-          <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         </div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
           <p className="text-gray-600">No fixtures found for this season.</p>
@@ -159,7 +155,6 @@ function Dashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Fixtures Dashboard</h1>
-        <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         <p className="text-sm text-gray-500 mt-1">
           Click on any fixture to edit gameweek and xG values
         </p>

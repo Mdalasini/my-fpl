@@ -12,12 +12,11 @@ interface Props {
   min: number;
   max: number;
   sortBy: "offense" | "defense";
-  season: string;
 }
 
-export default function TableRow({ teamId, min, max, sortBy, season }: Props) {
-  const teamsQuery = useTeams(season);
-  const fixturesQuery = useFixtures(season);
+export default function TableRow({ teamId, min, max, sortBy }: Props) {
+  const teamsQuery = useTeams();
+  const fixturesQuery = useFixtures();
 
   if (!teamsQuery.data || !fixturesQuery.data) return null;
 
@@ -64,7 +63,6 @@ export default function TableRow({ teamId, min, max, sortBy, season }: Props) {
           teamId={teamId}
           gameweek={gameweek}
           sortBy={sortBy}
-          season={season}
         />
       ))}
     </tr>
