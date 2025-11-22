@@ -1,9 +1,5 @@
 import dbConnect from "../infra/libsql";
-import {
-  type Fixture,
-  FixtureSchema,
-  type UpdateFixtureBody,
-} from "../types/fixtures";
+import { type Fixture, FixtureSchema } from "../types/fixtures";
 
 export async function getFixtures(): Promise<Fixture[]> {
   const db = await dbConnect();
@@ -30,27 +26,4 @@ export async function getFixturesNotInEloChanges(): Promise<Fixture[]> {
   `,
   );
   return result.rows.map((row) => FixtureSchema.parse(row));
-}
-
-export async function updateFixture(
-  update: UpdateFixtureBody,
-  id: number,
-): Promise<void> {
-  const db = await dbConnect();
-  const updates: string[] = [];
-  const params: (number | null)[] = [];
-  if (update.team_h_xg !== undefined) {
-    updates.push("home_xg = ?");
-    params.push(update.team_h_xg);
-  }
-  if (update.team_a_xg !== undefined) {
-    updates.push("away_xg = ?");
-    params.push(update.team_a_xg);
-  }
-  if (updates.length === 0) {
-    return;
-  }
-  const sql = `UPDATE fixtures SET ${updates.join(", ")} WHERE id = ?`;
-  params.push(id);
-  await db.execute(sql, params);
 }

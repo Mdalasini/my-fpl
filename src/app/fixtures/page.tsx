@@ -3,10 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
-import {
-  useCurrentGameweek,
-  useUpdateCurrentGameweek,
-} from "@/lib/hooks/useCurrentGameweek";
+import { useCurrentGameweek } from "@/lib/hooks/useCurrentGameweek";
 import FixtureCard from "@/app/components/FixtureCard";
 import type { Fixture } from "@/lib/types/fixtures";
 import { AltArrowLeft, AltArrowRight } from "@solar-icons/react";
@@ -215,22 +212,6 @@ function Dashboard() {
             <p className="text-gray-600">No fixtures for this gameweek.</p>
           )}
         </div>
-
-        {/* Set Current Gameweek */}
-        {currentGwData && currentGameweek !== currentGwData.gameweek && (
-          <div className="mt-4 flex justify-center">
-            <button
-              type="button"
-              onClick={() =>
-                updateCurrentGw.mutate({ gameweek: currentGameweek })
-              }
-              disabled={updateCurrentGw.isPending}
-              className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              {updateCurrentGw.isPending ? "Updating..." : "Set Current GW"}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -11,11 +11,6 @@ export const FixtureSchema = z.object({
   team_a_xg: z.number().nullable(),
 });
 
-export interface UpdateFixtureBody {
-  team_h_xg?: number | null;
-  team_a_xg?: number | null;
-}
-
 export type Fixture = z.infer<typeof FixtureSchema>;
 
 export type FixturesResponse = Fixture[];

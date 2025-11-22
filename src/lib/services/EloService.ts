@@ -1,5 +1,5 @@
 import dbConnect from "../infra/libsql";
-import { type EloChange, TotalEloChangeSchema } from "../types/eloChange";
+import { TotalEloChangeSchema } from "../types/eloChange";
 import { TeamEloSchema, type TeamElo } from "../types/elos";
 
 export async function getTeamElo(team_id: string): Promise<TeamElo> {
@@ -18,15 +18,4 @@ export async function getTeamElo(team_id: string): Promise<TeamElo> {
     off_elo: base.off_elo + changes.total_off,
     def_elo: base.def_elo + changes.total_def,
   };
-}
-
-export async function recordEloChange(change: EloChange) {
-  const db = await dbConnect();
-  const query = `INSERT INTO elo_changes (fixture_code, team_id, off_change, def_change) VALUES (?, ?, ?, ?)`;
-  await db.execute(query, [
-    change.fixture_code,
-    change.team_id,
-    change.off_change,
-    change.def_change,
-  ]);
 }
