@@ -1,9 +1,12 @@
 import { createClient } from "@libsql/client";
 
-const DATABASE_URI = process.env.DATABASE_URI;
+const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL;
+const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
-if (!DATABASE_URI) {
+if (!TURSO_DATABASE_URL) {
   throw new Error("DATABASE_URI environment variable is not set");
+} else if (!TURSO_AUTH_TOKEN) {
+  throw new Error("AUTH_TOKEN environment variable is not set");
 }
 
 declare global {
@@ -24,7 +27,8 @@ async function dbConnect() {
   }
 
   cached.conn = createClient({
-    url: DATABASE_URI as string,
+    url: TURSO_DATABASE_URL as string,
+    authToken: TURSO_AUTH_TOKEN as string,
   });
 
   return cached.conn;

@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { CURRENT_GAMEWEEK } from "@/lib/config/gameweek";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
 import {
@@ -35,14 +34,21 @@ function Dashboard() {
     error: teamsError,
   } = useTeams();
   const { data: currentGwData } = useCurrentGameweek();
-  const updateCurrentGw = useUpdateCurrentGameweek();
+  const [currentGameweek, setCurrentGameweek] = useState<number>(1);
+
+  // set initial gameweek based on fetched current gameweek
+  useEffect(() => {
+    if (currentGwData) {
+      setCurrentGameweek(currentGwData.gameweek);
+    }
+  }, [currentGwData]);
 
   // Create a map of team_id to team short_name for quick lookup
   const teamsMap = useMemo(() => {
-    const map = new Map<string, string>();
+    const map = new Map<number, string>();
     if (teams) {
       teams.forEach((team) => {
-        map.set(team.team_id, team.short_name);
+        map.set(team.id, team.short_name);
       });
     }
     return map;
@@ -53,13 +59,13 @@ function Dashboard() {
     if (!fixtures) return new Map<number, Fixture[]>();
 
     const grouped = new Map<number, Fixture[]>();
-    const sorted = [...fixtures].sort((a, b) => a.gameweek - b.gameweek);
+    const sorted = [...fixtures].sort((a, b) => a.event - b.event);
 
     sorted.forEach((fixture) => {
-      if (!grouped.has(fixture.gameweek)) {
-        grouped.set(fixture.gameweek, []);
+      if (!grouped.has(fixture.event)) {
+        grouped.set(fixture.event, []);
       }
-      const gameweekFixtures = grouped.get(fixture.gameweek);
+      const gameweekFixtures = grouped.get(fixture.event);
       if (gameweekFixtures) {
         gameweekFixtures.push(fixture);
       }
@@ -75,14 +81,6 @@ function Dashboard() {
   const minGameweek = gameweeks.length > 0 ? gameweeks[0] : 1;
   const maxGameweek =
     gameweeks.length > 0 ? gameweeks[gameweeks.length - 1] : 1;
-
-  const [currentGameweek, setCurrentGameweek] = useState(CURRENT_GAMEWEEK);
-
-  useEffect(() => {
-    if (gameweeks.length > 0 && !gameweeks.includes(currentGameweek)) {
-      setCurrentGameweek(minGameweek);
-    }
-  }, [gameweeks, currentGameweek, minGameweek]);
 
   // Loading state
   if (fixturesLoading || teamsLoading) {
@@ -209,7 +207,7 @@ function Dashboard() {
             .get(currentGameweek)
             ?.map((fixture) => (
               <FixtureCard
-                key={fixture.id}
+                key={fixture.code}
                 fixture={fixture}
                 teamsMap={teamsMap}
               />

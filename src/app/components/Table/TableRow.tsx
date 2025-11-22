@@ -7,7 +7,7 @@ import TableCell from "./TableCell";
 import { opponentsForTeamInRange, getAttack, getDefense } from "./utils";
 
 interface Props {
-  teamId: string;
+  teamId: number;
   min: number;
   max: number;
   sortBy: "offense" | "defense";
@@ -20,9 +20,9 @@ export default function TableRow({ teamId, min, max, sortBy }: Props) {
   if (!teamsQuery.data || !fixturesQuery.data) return null;
 
   // team lookup table
-  const teamById: Record<string, TeamData> = {};
+  const teamById: Record<number, TeamData> = {};
   teamsQuery.data.forEach((team) => {
-    teamById[team.team_id] = team;
+    teamById[team.id] = team;
   });
 
   const opponents = opponentsForTeamInRange(

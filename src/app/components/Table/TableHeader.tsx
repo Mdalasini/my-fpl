@@ -12,7 +12,7 @@ interface Props {
   fixtures: Fixture[];
   sortBy: "offense" | "defense";
   onOrderChange: (
-    orderedTeamIds: string[],
+    orderedTeamIds: number[],
     column: number,
     direction: "asc" | "desc",
   ) => void;
@@ -49,13 +49,11 @@ export default function TableHeader({
 
     const sortKey: "off" | "def" = sortBy === "offense" ? "off" : "def";
 
-    let ordered: string[] = [];
+    let ordered: number[] = [];
     if (column === 0) {
       const startWeek = min;
       const overallMax =
-        fixtures.length > 0
-          ? Math.max(...fixtures.map((f) => f.gameweek))
-          : max;
+        fixtures.length > 0 ? Math.max(...fixtures.map((f) => f.event)) : max;
       const endWeek = Math.min(min + gameweekRange, overallMax);
       ordered = sortByGameweekRange(
         fixtures,

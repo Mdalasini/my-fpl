@@ -7,15 +7,15 @@ import {
 
 export async function getFixtures(): Promise<Fixture[]> {
   const db = await dbConnect();
-  const result = await db.execute(
-    "SELECT * FROM fixtures WHERE season = (SELECT value FROM app_config WHERE key = 'current_season')",
-  );
+  const result = await db.execute("SELECT * FROM fixtures");
   return result.rows.map((row) => FixtureSchema.parse(row));
 }
 
-export async function getFixture(id: number): Promise<Fixture | null> {
+export async function getFixture(code: number): Promise<Fixture | null> {
   const db = await dbConnect();
-  const result = await db.execute("SELECT * FROM fixtures WHERE id = ?", [id]);
+  const result = await db.execute("SELECT * FROM fixtures WHERE code = ?", [
+    code,
+  ]);
   if (result.rows.length === 0) return null;
   return FixtureSchema.parse(result.rows[0]);
 }
@@ -25,9 +25,8 @@ export async function getFixturesNotInEloChanges(): Promise<Fixture[]> {
   const result = await db.execute(
     `
     SELECT * FROM fixtures
-    WHERE season = (SELECT value FROM app_config WHERE key = 'current_season')
-    AND id NOT IN (SELECT fixture_id FROM fixture_elo_changes)
-    AND (home_xg IS NOT NULL OR away_xg IS NOT NULL)
+    WHERE code NOT IN (SELECT fixture_code FROM fixture_elo_changes)
+    AND (team_h_xg IS NOT NULL OR team_a_xg IS NOT NULL)
   `,
   );
   return result.rows.map((row) => FixtureSchema.parse(row));
@@ -40,17 +39,13 @@ export async function updateFixture(
   const db = await dbConnect();
   const updates: string[] = [];
   const params: (number | null)[] = [];
-  if (update.home_xg !== undefined) {
+  if (update.team_h_xg !== undefined) {
     updates.push("home_xg = ?");
-    params.push(update.home_xg);
+    params.push(update.team_h_xg);
   }
-  if (update.away_xg !== undefined) {
+  if (update.team_a_xg !== undefined) {
     updates.push("away_xg = ?");
-    params.push(update.away_xg);
-  }
-  if (update.gameweek !== undefined) {
-    updates.push("gameweek = ?");
-    params.push(update.gameweek);
+    params.push(update.team_a_xg);
   }
   if (updates.length === 0) {
     return;

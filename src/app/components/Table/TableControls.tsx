@@ -63,8 +63,7 @@ export default function TableControls({
 
       <div className="mt-3 mb-6 flex items-center gap-3">
         <span className="text-sm font-medium text-gray-700">Select Range:</span>
-        <div
-          role="group"
+        <fieldset
           aria-label="Select gameweek range"
           className="inline-flex rounded-lg border border-gray-300 overflow-hidden"
         >
@@ -90,7 +89,7 @@ export default function TableControls({
               </button>
             );
           })}
-        </div>
+        </fieldset>
       </div>
 
       <div className="flex items-center gap-4 mt-6">

@@ -20,14 +20,12 @@ export async function getCurrentSeason(): Promise<CurrentSeason> {
 export async function getCurrentGameweek(): Promise<CurrentGameweek> {
   const db = await dbConnect();
   const result = await db.execute(
-    "SELECT value FROM app_config WHERE key = 'current_gameweek'",
+    "SELECT * FROM fixtures WHERE kickoff_time > CURRENT_DATE ORDER BY event ASC LIMIT 1",
   );
   if (result.rows.length === 0) {
-    throw new Error("Current gameweek not found in app_config");
+    throw new Error("Current gameweek not found in fixtures");
   }
-  // Convert to number if it's stored as a string
-  const value = result.rows[0].value;
-  return CurrentGameweekSchema.parse(value);
+  return CurrentGameweekSchema.parse(result.rows[0].event);
 }
 
 export async function updateCurrentGameweek(gameweek: number): Promise<void> {

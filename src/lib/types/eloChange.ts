@@ -1,7 +1,7 @@
 import z from "zod";
 
 export interface EloChange {
-  fixture_id: number;
+  fixture_code: number;
   team_id: string;
   off_change: number;
   def_change: number;

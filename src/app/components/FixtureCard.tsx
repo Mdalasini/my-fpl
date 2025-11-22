@@ -6,47 +6,42 @@ import { useUpdateFixture } from "@/lib/hooks/useFixtures";
 
 interface FixtureCardProps {
   fixture: Fixture;
-  teamsMap: Map<string, string>;
+  teamsMap: Map<number, string>;
 }
 
 export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [gameweek, setGameweek] = useState(fixture.gameweek);
-  const [homeXg, setHomeXg] = useState(fixture.home_xg ?? "");
-  const [awayXg, setAwayXg] = useState(fixture.away_xg ?? "");
+  const [gameweek, setGameweek] = useState(fixture.event);
+  const [homeXg, setHomeXg] = useState(fixture.team_h_xg ?? "");
+  const [awayXg, setAwayXg] = useState(fixture.team_a_xg ?? "");
   const [error, setError] = useState<string | null>(null);
 
   const updateMutation = useUpdateFixture();
 
-  const homeTeamName = teamsMap.get(fixture.home_id) || fixture.home_id;
-  const awayTeamName = teamsMap.get(fixture.away_id) || fixture.away_id;
+  const homeTeamName = teamsMap.get(fixture.team_h) || fixture.team_h;
+  const awayTeamName = teamsMap.get(fixture.team_a) || fixture.team_a;
 
   const handleSave = async () => {
     try {
       setError(null);
 
       const updateData: {
-        gameweek?: number;
-        home_xg?: number | null;
-        away_xg?: number | null;
+        team_h_xg?: number | null;
+        team_a_xg?: number | null;
       } = {};
 
-      if (gameweek !== fixture.gameweek) {
-        updateData.gameweek = gameweek;
-      }
-
-      if (homeXg !== (fixture.home_xg ?? "")) {
-        updateData.home_xg =
+      if (homeXg !== (fixture.team_h_xg ?? "")) {
+        updateData.team_h_xg =
           homeXg === "" ? null : parseFloat(homeXg as string);
       }
 
-      if (awayXg !== (fixture.away_xg ?? "")) {
-        updateData.away_xg =
+      if (awayXg !== (fixture.team_a_xg ?? "")) {
+        updateData.team_a_xg =
           awayXg === "" ? null : parseFloat(awayXg as string);
       }
 
       await updateMutation.mutateAsync({
-        fixtureId: fixture.id,
+        fixtureId: fixture.code,
         data: updateData,
       });
 
@@ -57,9 +52,9 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
   };
 
   const handleCancel = () => {
-    setGameweek(fixture.gameweek);
-    setHomeXg(fixture.home_xg ?? "");
-    setAwayXg(fixture.away_xg ?? "");
+    setGameweek(fixture.event);
+    setHomeXg(fixture.team_h_xg ?? "");
+    setAwayXg(fixture.team_a_xg ?? "");
     setError(null);
     setIsEditing(false);
   };
@@ -111,11 +106,11 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 flex-1">
             <span className="text-gray-900 font-semibold">{homeTeamName}</span>
-            <label htmlFor={`home-xg-${fixture.id}`} className="sr-only">
+            <label htmlFor={`home-xg-${fixture.code}`} className="sr-only">
               Home Team xG
             </label>
             <input
-              id={`home-xg-${fixture.id}`}
+              id={`home-xg-${fixture.code}`}
               type="number"
               value={homeXg}
               onChange={(e) => setHomeXg(e.target.value)}
@@ -129,11 +124,11 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
             vs
           </span>
           <div className="flex items-center gap-2 justify-end flex-1">
-            <label htmlFor={`away-xg-${fixture.id}`} className="sr-only">
+            <label htmlFor={`away-xg-${fixture.code}`} className="sr-only">
               Away Team xG
             </label>
             <input
-              id={`away-xg-${fixture.id}`}
+              id={`away-xg-${fixture.code}`}
               type="number"
               value={awayXg}
               onChange={(e) => setAwayXg(e.target.value)}
@@ -149,13 +144,13 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
         {/* Gameweek Input */}
         <div className="flex items-center gap-3 bg-gray-50/60 p-3 rounded-lg border border-gray-100">
           <label
-            htmlFor={`gw-${fixture.id}`}
+            htmlFor={`gw-${fixture.code}`}
             className="text-sm font-medium text-gray-700 mr-2"
           >
             Gameweek:
           </label>
           <input
-            id={`gw-${fixture.id}`}
+            id={`gw-${fixture.code}`}
             type="number"
             value={gameweek}
             onChange={(e) =>

@@ -10,7 +10,7 @@ export async function getTeamElo(team_id: string): Promise<TeamElo> {
     throw new Error(`Team with id ${team_id} not found in team_elos`);
   }
   const base = TeamEloSchema.parse(baseResult.rows[0]);
-  const changeQuery = `SELECT COALESCE(SUM(off_change), 0) as total_off, COALESCE(SUM(def_change), 0) as total_def FROM fixture_elo_changes WHERE team_id = ?`;
+  const changeQuery = `SELECT COALESCE(SUM(off_change), 0) as total_off, COALESCE(SUM(def_change), 0) as total_def FROM elo_changes WHERE team_id = ?`;
   const changeResult = await db.execute(changeQuery, [team_id]);
   const changes = TotalEloChangeSchema.parse(changeResult.rows[0]);
   return {
@@ -22,9 +22,9 @@ export async function getTeamElo(team_id: string): Promise<TeamElo> {
 
 export async function recordEloChange(change: EloChange) {
   const db = await dbConnect();
-  const query = `INSERT INTO fixture_elo_changes (fixture_id, team_id, off_change, def_change) VALUES (?, ?, ?, ?)`;
+  const query = `INSERT INTO elo_changes (fixture_code, team_id, off_change, def_change) VALUES (?, ?, ?, ?)`;
   await db.execute(query, [
-    change.fixture_id,
+    change.fixture_code,
     change.team_id,
     change.off_change,
     change.def_change,

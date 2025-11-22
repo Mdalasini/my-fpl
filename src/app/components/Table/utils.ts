@@ -2,10 +2,10 @@ import type { Fixture } from "@/lib/types/fixtures";
 import type { TeamData } from "@/lib/types/teams";
 
 let LEAGUE_MEAN = 0;
-const TEAMBYID: Record<string, TeamData> = {};
+const TEAMBYID: Record<number, TeamData> = {};
 
 interface Opponent {
-  team_id: string;
+  id: number;
   home: boolean;
 }
 
@@ -20,42 +20,36 @@ export function initDifficultyModel(allTeams: TeamData[]): void {
   LEAGUE_MEAN = mean;
 
   allTeams.forEach((team) => {
-    TEAMBYID[team.team_id] = team;
+    TEAMBYID[team.id] = team;
   });
 }
 
 export function opponentsForTeamInWeek(
-  teamId: string,
+  teamId: number,
   gameweek: number,
   fixtures: Fixture[],
 ): Opponent[] {
   return fixtures
-    .filter((fixture) => fixture.gameweek === gameweek)
+    .filter((fixture) => fixture.event === gameweek)
     .map((fixture) => {
-      if (fixture.home_id === teamId)
-        return { team_id: fixture.away_id, home: true };
-      if (fixture.away_id === teamId)
-        return { team_id: fixture.home_id, home: false };
+      if (fixture.team_h === teamId) return { id: fixture.team_a, home: true };
+      if (fixture.team_a === teamId) return { id: fixture.team_h, home: false };
       return null;
     })
     .filter((opponent): opponent is Opponent => opponent !== null);
 }
 
 export function opponentsForTeamInRange(
-  teamId: string,
+  teamId: number,
   startWeek: number,
   endWeek: number,
   fixtures: Fixture[],
 ): Opponent[] {
   return fixtures
-    .filter(
-      (fixture) => fixture.gameweek >= startWeek && fixture.gameweek <= endWeek,
-    )
+    .filter((fixture) => fixture.event >= startWeek && fixture.event <= endWeek)
     .map((fixture) => {
-      if (fixture.home_id === teamId)
-        return { team_id: fixture.away_id, home: true };
-      if (fixture.away_id === teamId)
-        return { team_id: fixture.home_id, home: false };
+      if (fixture.team_h === teamId) return { id: fixture.team_a, home: true };
+      if (fixture.team_a === teamId) return { id: fixture.team_h, home: false };
       return null;
     })
     .filter((opponent): opponent is Opponent => opponent !== null);
@@ -78,7 +72,7 @@ export function getAttack(
   if (opponents.length === 0) return { gw_attack: 0, difficulty: "invalid" };
 
   const scores = opponents.map((opponent) =>
-    squash(offenseA - TEAMBYID[opponent.team_id].def_rating, k),
+    squash(offenseA - TEAMBYID[opponent.id].def_rating, k),
   );
   const gw_attack = combineWeighted(scores);
 
@@ -99,7 +93,7 @@ export function getDefense(
   if (opponents.length === 0) return { gw_defense: 0, difficulty: "invalid" };
 
   const scores = opponents.map((opponent) =>
-    squash(defenseA - TEAMBYID[opponent.team_id].off_rating, k),
+    squash(defenseA - TEAMBYID[opponent.id].off_rating, k),
   );
   const gw_defense = combineWeighted(scores);
 
@@ -114,11 +108,12 @@ export function sortByGameweek(
   gameweek: number,
   direction: "asc" | "desc",
   sortBy: "off" | "def",
-): string[] {
-  const teamScores: { teamId: string; score: number }[] = [];
+): number[] {
+  const teamScores: { teamId: number; score: number }[] = [];
   Object.keys(TEAMBYID).forEach((teamId) => {
-    const opponents = opponentsForTeamInWeek(teamId, gameweek, src);
-    const team = TEAMBYID[teamId];
+    const numericTeamId = parseInt(teamId, 10);
+    const opponents = opponentsForTeamInWeek(numericTeamId, gameweek, src);
+    const team = TEAMBYID[numericTeamId];
     let score: number;
     if (sortBy === "off") {
       const { gw_attack } = getAttack(team.off_rating, opponents);
@@ -127,7 +122,7 @@ export function sortByGameweek(
       const { gw_defense } = getDefense(team.def_rating, opponents);
       score = gw_defense;
     }
-    teamScores.push({ teamId, score });
+    teamScores.push({ teamId: numericTeamId, score });
   });
 
   teamScores.sort((a, b) => {
@@ -147,11 +142,17 @@ export function sortByGameweekRange(
   endWeek: number,
   direction: "asc" | "desc",
   sortBy: "off" | "def",
-): string[] {
-  const teamScores: { teamId: string; score: number }[] = [];
+): number[] {
+  const teamScores: { teamId: number; score: number }[] = [];
   Object.keys(TEAMBYID).forEach((teamId) => {
-    const opponents = opponentsForTeamInRange(teamId, startWeek, endWeek, src);
-    const team = TEAMBYID[teamId];
+    const numericTeamId = parseInt(teamId, 10);
+    const opponents = opponentsForTeamInRange(
+      numericTeamId,
+      startWeek,
+      endWeek,
+      src,
+    );
+    const team = TEAMBYID[numericTeamId];
     let score: number;
     if (sortBy === "off") {
       const { gw_attack } = getAttack(team.off_rating, opponents);
@@ -160,7 +161,7 @@ export function sortByGameweekRange(
       const { gw_defense } = getDefense(team.def_rating, opponents);
       score = gw_defense;
     }
-    teamScores.push({ teamId, score });
+    teamScores.push({ teamId: numericTeamId, score });
   });
 
   teamScores.sort((a, b) => {

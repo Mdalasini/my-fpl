@@ -1,19 +1,19 @@
 import { z } from "zod";
 
 export const FixtureSchema = z.object({
-  id: z.number(),
-  home_id: z.string(),
-  away_id: z.string(),
-  gameweek: z.number(),
-  season: z.string(),
-  home_xg: z.number().nullable(),
-  away_xg: z.number().nullable(),
+  code: z.number(),
+  event: z.number(),
+  finished: z.number().pipe(z.coerce.boolean()),
+  team_h: z.number(),
+  team_a: z.number(),
+  kickoff_time: z.string().pipe(z.coerce.date()),
+  team_h_xg: z.number().nullable(),
+  team_a_xg: z.number().nullable(),
 });
 
 export interface UpdateFixtureBody {
-  home_xg?: number | null;
-  away_xg?: number | null;
-  gameweek?: number;
+  team_h_xg?: number | null;
+  team_a_xg?: number | null;
 }
 
 export type Fixture = z.infer<typeof FixtureSchema>;

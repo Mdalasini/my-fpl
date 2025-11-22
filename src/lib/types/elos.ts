@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const TeamEloSchema = z.object({
-  team_id: z.string(),
+  team_id: z.number(),
   off_elo: z.number(),
   def_elo: z.number(),
 });

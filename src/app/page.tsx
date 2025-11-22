@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "./components/Table";
-import { Fixture } from "@/lib/types/fixtures";
+import type { Fixture } from "@/lib/types/fixtures";
 
 const WINDOW_SIZE = 10;
 
@@ -31,7 +31,7 @@ function Table() {
   const gameweekQuery = useCurrentGameweek();
   const [window, setWindow] = useState([1, 1 + WINDOW_SIZE - 1]);
   const [sortBy, setSortBy] = useState<"offense" | "defense">("offense");
-  const [orderedTeamIds, setOrderedTeamIds] = useState<string[] | null>(null);
+  const [orderedTeamIds, setOrderedTeamIds] = useState<number[] | null>(null);
   const [gameweekRange, setGameweekRange] = useState(5);
 
   // set initial window based on fetched current gameweek
@@ -56,7 +56,7 @@ function Table() {
     if (!teamsQuery.data) return [];
     return [...teamsQuery.data]
       .sort((a, b) => a.short_name.localeCompare(b.short_name))
-      .map((team) => team.team_id);
+      .map((team) => team.id);
   }, [teamsQuery.data]);
 
   function handleWindowChange(direction: "next" | "prev") {
@@ -192,7 +192,7 @@ function getMinMaxGameweek(fixtures: Fixture[]): { min: number; max: number } {
     };
   }
 
-  const gameweeks = fixtures.map((fixture) => fixture.gameweek);
+  const gameweeks = fixtures.map((fixture) => fixture.event);
 
   return {
     min: Math.min(...gameweeks),

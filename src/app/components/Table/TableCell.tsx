@@ -6,7 +6,7 @@ import type { TeamData } from "@/lib/types/teams";
 import { opponentsForTeamInWeek, getAttack, getDefense } from "./utils";
 
 interface Props {
-  teamId: string;
+  teamId: number;
   gameweek: number;
   sortBy: "offense" | "defense";
 }
@@ -31,9 +31,9 @@ export default function TableCell({ teamId, gameweek, sortBy }: Props) {
   );
 
   // team lookup table
-  const teamById: Record<string, TeamData> = {};
+  const teamById: Record<number, TeamData> = {};
   teamsQuery.data.forEach((team) => {
-    teamById[team.team_id] = team;
+    teamById[team.id] = team;
   });
 
   const attackStats = getAttack(teamById[teamId].off_rating, weekOpponents);
@@ -54,10 +54,10 @@ export default function TableCell({ teamId, gameweek, sortBy }: Props) {
       <div className="flex flex-col items-center justify-center w-full h-full gap-1">
         {weekOpponents && weekOpponents.length > 0 ? (
           weekOpponents.map((opp) => (
-            <div key={opp.team_id} className="text-sm truncate w-full px-1">
+            <div key={opp.id} className="text-sm truncate w-full px-1">
               {opp.home
-                ? `H:${teamById[opp.team_id].short_name}`
-                : `A:${teamById[opp.team_id].short_name}`}
+                ? `H:${teamById[opp.id].short_name}`
+                : `A:${teamById[opp.id].short_name}`}
             </div>
           ))
         ) : (
