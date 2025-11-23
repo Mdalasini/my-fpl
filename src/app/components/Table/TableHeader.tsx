@@ -31,6 +31,14 @@ export default function TableHeader({
     [min, max],
   );
 
+  const highlightedGameweeks = useMemo(() => {
+    const highlighted = new Set<number>();
+    for (let i = 0; i < gameweekRange; i++) {
+      highlighted.add(min + i);
+    }
+    return highlighted;
+  }, [min, gameweekRange]);
+
   const [sortColumn, setSortColumn] = useState<number>(-1);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [lastSortBy, setLastSortBy] = useState<"offense" | "defense">(
@@ -94,7 +102,11 @@ export default function TableHeader({
         {gameweeks.map((gameweek) => (
           <th
             key={gameweek}
-            className="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2 border-b border-gray-200 cursor-pointer"
+            className={`text-left text-xs font-medium uppercase tracking-wider px-3 py-2 border-b border-gray-200 cursor-pointer ${
+              highlightedGameweeks.has(gameweek)
+                ? "bg-blue-50 text-gray-900 font-semibold"
+                : "bg-gray-50 text-gray-500"
+            }`}
             onClick={() => handleHeaderClick(gameweek)}
           >
             <div className="flex justify-between items-center gap-1">
