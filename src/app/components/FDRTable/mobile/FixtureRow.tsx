@@ -1,8 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
 import type { SortBy } from "../types";
 import { useFDRData } from "../context/FDRDataProvider";
-import { getDifficultyColors } from "../utils";
+import { getDifficultyColors, getDifficultyFromPercentile } from "../utils";
 import { OpponentChip } from "../shared";
 
 interface FixtureRowProps {
@@ -16,7 +17,25 @@ interface FixtureRowProps {
  * Uses sleek, minimal styling with subtle difficulty indicators
  */
 export function FixtureRow({ teamId, gameweek, sortBy }: FixtureRowProps) {
-  const { difficultyScores, teamById } = useFDRData();
+  const { difficultyScores, teamById, teams } = useFDRData();
+
+  // Calculate all team scores for this gameweek for percentile ranking
+  const allScoresForGameweek = useMemo(() => {
+    if (!difficultyScores || !teams) return { attack: [], defense: [] };
+
+    const attackScores: number[] = [];
+    const defenseScores: number[] = [];
+
+    for (const team of teams) {
+      const score = difficultyScores.byTeam[team.id]?.[gameweek];
+      if (score) {
+        attackScores.push(score.attack.score);
+        defenseScores.push(score.defense.score);
+      }
+    }
+
+    return { attack: attackScores, defense: defenseScores };
+  }, [difficultyScores, teams, gameweek]);
 
   if (!difficultyScores || !teamById) return null;
 
@@ -33,8 +52,12 @@ export function FixtureRow({ teamId, gameweek, sortBy }: FixtureRowProps) {
   }
 
   const { attack, defense } = gameweekScore;
-  const difficulty =
-    sortBy === "offense" ? attack.difficulty : defense.difficulty;
+  const score = sortBy === "offense" ? attack.score : defense.score;
+  const allScores =
+    sortBy === "offense"
+      ? allScoresForGameweek.attack
+      : allScoresForGameweek.defense;
+  const difficulty = getDifficultyFromPercentile(score, allScores);
   const colors = getDifficultyColors(difficulty);
   const opponents = attack.opponents;
 
